@@ -4,15 +4,21 @@ services:
   php:
     build:
       context: ./php7.2
+    container_name: lamp-php
     volumes:
       - ./php7.2/php.ini:/usr/local/etc/php/php.ini
       - ./html:/var/www/html
+      - ./log/xdebug.log:/tmp/xdebug.log
     ports:
-      - 8000:80
-    links:
-      - mysql:mysql
+      - 80:80
+    tty: true
+    stdin_open: true
+    depends_on:
+      - mysql
   mysql:
     image: mysql:5.7
+    container_name: lamp-mysql
+    hostname: mysql
     volumes:
       - ./mysql:/var/lib/mysql
     ports:
@@ -24,13 +30,12 @@ services:
       - MYSQL_PASSWORD=test
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: lamp-pma
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=mysql
       - PMA_USER=test
       - PMA_PASSWORD=test
-    links:
-      - mysql
     ports:
       - 4000:80
     volumes:
